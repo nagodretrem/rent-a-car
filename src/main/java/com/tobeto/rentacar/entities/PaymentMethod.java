@@ -1,11 +1,18 @@
 package com.tobeto.rentacar.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Table(name = "payment_methods")
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PaymentMethod
 {
     @Id
@@ -18,5 +25,6 @@ public class PaymentMethod
 
 
     @OneToMany(mappedBy = "paymentMethod")
+    @JsonIgnore
     private List<Payment> payments;
 }

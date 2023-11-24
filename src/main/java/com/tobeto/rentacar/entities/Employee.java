@@ -1,11 +1,18 @@
 package com.tobeto.rentacar.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Table(name = "employees")
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Employee
 {
     @Id
@@ -34,11 +41,12 @@ public class Employee
     private boolean status;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "department_id")
     private Department department;
 
     @OneToMany(mappedBy = "employee")
-    @JoinColumn(name = "reservation_id")
+    @JsonIgnore
     private List<Reservation> reservations;
 
 }

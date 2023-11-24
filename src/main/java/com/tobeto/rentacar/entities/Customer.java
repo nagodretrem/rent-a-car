@@ -1,9 +1,16 @@
 package com.tobeto.rentacar.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Table(name = "customers")
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Customer
 {
     @Id
@@ -33,6 +40,7 @@ public class Customer
     private String address;
 
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 

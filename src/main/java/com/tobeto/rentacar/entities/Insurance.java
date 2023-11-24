@@ -1,12 +1,19 @@
 package com.tobeto.rentacar.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 
 
 @Table(name = "insurances")
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Insurance
 {
     @Id
@@ -29,12 +36,19 @@ public class Insurance
     @Column(name = "price")
     private double price;
 
-    @OneToOne
+    @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "car_id")
     private Car car;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "coverage_id")
     private InsuranceCoverage insuranceCoverage;
+
+    @OneToOne
+    @JsonIgnore
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
 
 }
