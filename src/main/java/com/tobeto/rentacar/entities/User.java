@@ -1,5 +1,6 @@
 package com.tobeto.rentacar.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,9 +42,11 @@ public class User {
     private Date birthDate;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Customer> customers;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Employee> employees;
 
 }

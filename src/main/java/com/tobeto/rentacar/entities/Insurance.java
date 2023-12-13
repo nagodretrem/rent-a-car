@@ -1,5 +1,6 @@
 package com.tobeto.rentacar.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,5 +33,6 @@ public class Insurance {
     private InsuranceCompany insuranceCompany;
 
     @OneToMany(mappedBy = "insurance")
+    @JsonIgnore
     private List<Rental> rentals;
 }
