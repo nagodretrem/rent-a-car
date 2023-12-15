@@ -1,5 +1,10 @@
 package com.tobeto.rentacar.controllers;
 
+import com.tobeto.rentacar.dtos.requests.color.AddColorRequest;
+import com.tobeto.rentacar.dtos.requests.color.UpdateColorRequest;
+
+import com.tobeto.rentacar.dtos.responses.color.GetColorListResponse;
+import com.tobeto.rentacar.dtos.responses.color.GetColorResponse;
 import com.tobeto.rentacar.entities.Color;
 import com.tobeto.rentacar.repositories.ColorRepository;
 import org.springframework.web.bind.annotation.*;
@@ -19,29 +24,50 @@ public class ColorsController {
 
 
     @GetMapping
-    public List<Color> getAll(){
-        return colorRepository.findAll();
+    public List<GetColorListResponse> getAll(){
+
+        List<Color> colors = colorRepository.findAll();
+
+        return colors.stream().map(color -> {
+            GetColorListResponse response = new GetColorListResponse();
+            response.setId(color.getId());
+            response.setName(color.getName());
+            return response;
+        }).toList();
+
     }
 
     @GetMapping("{id}")
-    public Color getById(@PathVariable int id) {
-        return colorRepository.findById(id).orElseThrow();
+    public GetColorResponse getById(@PathVariable int id) {
+
+
+        Color color = colorRepository.findById(id).orElseThrow();
+        GetColorResponse response = new GetColorResponse();
+
+        response.setName(color.getName());
+
+        return response;
     }
 
 
     @PostMapping
-    public void save(@RequestBody Color color)
+    public void add(@RequestBody AddColorRequest request)
     {
+
+        Color color = new Color();
+        color.setName(request.getName());
+
         colorRepository.save(color);
     }
 
     @PutMapping("{id}")
-    public void update(@PathVariable int id, @RequestBody Color color){
-        Color updatedColor = colorRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no color with id: " + id));
-        updatedColor.setId(color.getId());
-        updatedColor.setName(color.getName());
+    public void update(@PathVariable int id, @RequestBody UpdateColorRequest request){
 
-        colorRepository.save(updatedColor);
+        Color color = colorRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no color with id: " + id));
+        color.setName(request.getName());
+
+        colorRepository.save(color);
+
     }
 
     @DeleteMapping("{id}")

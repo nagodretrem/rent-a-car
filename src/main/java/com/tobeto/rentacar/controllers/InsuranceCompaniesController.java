@@ -1,5 +1,9 @@
 package com.tobeto.rentacar.controllers;
 
+import com.tobeto.rentacar.dtos.requests.insurancecompany.AddInsuranceCompanyRequest;
+import com.tobeto.rentacar.dtos.requests.insurancecompany.UpdateInsuranceCompanyRequest;
+import com.tobeto.rentacar.dtos.responses.insurancecompany.GetInsuranceCompanyListResponse;
+import com.tobeto.rentacar.dtos.responses.insurancecompany.GetInsuranceCompanyResponse;
 import com.tobeto.rentacar.entities.InsuranceCompany;
 import com.tobeto.rentacar.repositories.InsuranceCompanyRepository;
 import org.springframework.web.bind.annotation.*;
@@ -17,31 +21,51 @@ public class InsuranceCompaniesController {
 
 
     @GetMapping
-    public List<InsuranceCompany> getAll(){
-        return insuranceCompanyRepository.findAll();
+    public List<GetInsuranceCompanyListResponse> getAll(){
+
+        List<InsuranceCompany> insuranceCompanies = insuranceCompanyRepository.findAll();
+
+        return insuranceCompanies.stream().map(insuranceCompany -> {
+            GetInsuranceCompanyListResponse response = new GetInsuranceCompanyListResponse();
+            response.setId(insuranceCompany.getId());
+            response.setName(insuranceCompany.getName());
+            return response;
+        }).toList();
+
+
     }
 
 
     @GetMapping("{id}")
-    public InsuranceCompany getById(@PathVariable int id) {
-        return insuranceCompanyRepository.findById(id).orElseThrow();
+    public GetInsuranceCompanyResponse getById(@PathVariable int id) {
+
+        InsuranceCompany insuranceCompany = insuranceCompanyRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no insurance company with id: " + id));
+        GetInsuranceCompanyResponse response = new GetInsuranceCompanyResponse();
+
+        response.setName(insuranceCompany.getName());
+        return response;
     }
 
 
     @PostMapping
-    public void save(@RequestBody InsuranceCompany insuranceCompany)
+    public void add(@RequestBody AddInsuranceCompanyRequest request)
     {
+
+        InsuranceCompany insuranceCompany = new InsuranceCompany();
+        insuranceCompany.setName(request.getName());
+
         insuranceCompanyRepository.save(insuranceCompany);
+
     }
 
 
     @PutMapping("{id}")
-    public void update(@PathVariable int id, @RequestBody InsuranceCompany insuranceCompany){
-        InsuranceCompany updatedInsuranceCompany = insuranceCompanyRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no insurance company with id: " + id));
-        updatedInsuranceCompany.setId(insuranceCompany.getId());
-        updatedInsuranceCompany.setName(insuranceCompany.getName());
+    public void update(@PathVariable int id, @RequestBody UpdateInsuranceCompanyRequest request){
 
-        insuranceCompanyRepository.save(updatedInsuranceCompany);
+        InsuranceCompany insuranceCompany = insuranceCompanyRepository.findById(id).orElseThrow();
+        insuranceCompany.setName(request.getName());
+
+        insuranceCompanyRepository.save(insuranceCompany);
     }
 
 

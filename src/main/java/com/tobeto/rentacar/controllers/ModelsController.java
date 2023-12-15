@@ -1,5 +1,10 @@
 package com.tobeto.rentacar.controllers;
 
+import com.tobeto.rentacar.dtos.requests.model.AddModelRequest;
+import com.tobeto.rentacar.dtos.requests.model.UpdateModelRequest;
+import com.tobeto.rentacar.dtos.responses.model.GetModelListResponse;
+import com.tobeto.rentacar.dtos.responses.model.GetModelResponse;
+import com.tobeto.rentacar.entities.Brand;
 import com.tobeto.rentacar.entities.Model;
 import com.tobeto.rentacar.repositories.ModelRepository;
 import org.springframework.web.bind.annotation.*;
@@ -17,27 +22,59 @@ public class ModelsController {
     }
 
     @GetMapping
-    public List<Model> getAll(){
-        return modelRepository.findAll();
+    public List<GetModelListResponse> getAll(){
+
+
+        List<Model> models = modelRepository.findAll();
+
+        return models.stream().map(model -> {
+            GetModelListResponse response = new GetModelListResponse();
+            response.setId(model.getId());
+            response.setName(model.getName());
+            return response;
+        }).toList();
     }
 
     @GetMapping("{id}")
-    public Model getById(@PathVariable int id) {
-        return modelRepository.findById(id).orElseThrow();
+    public GetModelResponse getById(@PathVariable int id) {
+
+
+        Model model = modelRepository.findById(id).orElseThrow();
+        GetModelResponse response = new GetModelResponse();
+
+        response.setName(model.getName());
+
+        return response;
     }
 
     @PostMapping
-    public void save(@RequestBody Model model){
+    public void add(@RequestBody AddModelRequest request){
+
+        Model model = new Model();
+        model.setName(request.getName());
+
+        Brand brand = new Brand();
+        brand.setId(request.getBrandId());
+        model.setBrand(brand);
+
         modelRepository.save(model);
+
+
     }
 
     @PutMapping("{id}")
-    public void update(@PathVariable int id, @RequestBody Model model){
-        Model updatedModel = modelRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no model with id: " + id));
-        updatedModel.setId(model.getId());
-        updatedModel.setName(model.getName());
+    public void update(@PathVariable int id, @RequestBody UpdateModelRequest request){
 
-        modelRepository.save(updatedModel);
+        Model model = modelRepository.findById(id).orElseThrow();
+        model.setName(request.getName());
+
+        Brand brand = new Brand();
+        brand.setId(request.getBrandId());
+        model.setBrand(brand);
+
+        modelRepository.save(model);
+
+
     }
 
     @DeleteMapping("{id}")

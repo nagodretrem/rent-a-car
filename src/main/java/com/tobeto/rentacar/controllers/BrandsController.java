@@ -1,5 +1,9 @@
 package com.tobeto.rentacar.controllers;
 
+import com.tobeto.rentacar.dtos.requests.brand.AddBrandRequest;
+import com.tobeto.rentacar.dtos.requests.brand.UpdateBrandRequest;
+import com.tobeto.rentacar.dtos.responses.brand.GetBrandListResponse;
+import com.tobeto.rentacar.dtos.responses.brand.GetBrandResponse;
 import com.tobeto.rentacar.entities.Brand;
 import com.tobeto.rentacar.repositories.BrandRepository;
 import org.springframework.web.bind.annotation.*;
@@ -17,29 +21,48 @@ public class BrandsController {
     }
 
     @GetMapping
-    public List<Brand> getAll(){
+    public List<GetBrandListResponse> getAll(){
 
-        return brandRepository.findAll();
+        List<Brand> brands = brandRepository.findAll();
+
+        return brands.stream().map(brand -> {
+            GetBrandListResponse response = new GetBrandListResponse();
+            response.setId(brand.getId());
+            response.setName(brand.getName());
+            return response;
+        }).toList();
+
+
     }
 
     @GetMapping("{id}")
-    public Brand getById(@PathVariable int id) {
-        return brandRepository.findById(id).orElseThrow();
+    public GetBrandResponse getById(@PathVariable int id) {
+
+        Brand brand = brandRepository.findById(id).orElseThrow();
+        GetBrandResponse response = new GetBrandResponse();
+
+        response.setName(brand.getName());
+
+        return response;
     }
 
     @PostMapping
-    public void save(@RequestBody Brand brand)
+    public void add(@RequestBody AddBrandRequest request)
     {
+        Brand brand = new Brand();
+        brand.setName(request.getName());
+
         brandRepository.save(brand);
     }
 
     @PutMapping("{id}")
-    public void update(@PathVariable int id, @RequestBody Brand brand){
-        Brand updatedBrand = brandRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no brand with id: " + id));
-        updatedBrand.setId(brand.getId());
-        updatedBrand.setName(brand.getName());
+    public void update(@PathVariable int id, @RequestBody UpdateBrandRequest request){
 
-        brandRepository.save(updatedBrand);
+        Brand brand = brandRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no brand with id: " + id));
+        brand.setName(request.getName());
+
+        brandRepository.save(brand);
+
     }
 
     @DeleteMapping("{id}")

@@ -1,5 +1,9 @@
 package com.tobeto.rentacar.controllers;
 
+import com.tobeto.rentacar.dtos.requests.user.AddUserRequest;
+import com.tobeto.rentacar.dtos.requests.user.UpdateUserRequest;
+import com.tobeto.rentacar.dtos.responses.user.GetUserListResponse;
+import com.tobeto.rentacar.dtos.responses.user.GetUserResponse;
 import com.tobeto.rentacar.entities.User;
 import com.tobeto.rentacar.repositories.UserRepository;
 import org.springframework.web.bind.annotation.*;
@@ -16,33 +20,68 @@ public class UsersController {
     }
 
     @GetMapping
-    public List<User> getAll(){
-        return userRepository.findAll();
+    public List<GetUserListResponse> getAll(){
+
+        List<User> users = userRepository.findAll();
+
+        return users.stream().map(user -> {
+            GetUserListResponse response = new GetUserListResponse();
+            response.setId(user.getId());
+            response.setFirstname(user.getFirstname());
+            response.setLastname(user.getLastname());
+            response.setEmail(user.getEmail());
+            return response;
+        }).toList();
+
     }
 
     @GetMapping("{id}")
-    public User getById(@PathVariable int id) {
-        return userRepository.findById(id).orElseThrow();
+    public GetUserResponse getById(@PathVariable int id) {
+
+        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no user with id: " + id));
+
+        GetUserResponse response = new GetUserResponse();
+
+        response.setFirstName(user.getFirstname());
+        response.setLastName(user.getLastname());
+        response.setEmail(user.getEmail());
+
+        return response;
+
     }
 
     @PostMapping
-    public void save(@RequestBody User user){
+    public void add(@RequestBody AddUserRequest request){
+
+        User user = new User();
+        user.setFirstname(request.getFirstName());
+        user.setLastname(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setNationalityNumber(request.getNationalityNumber());
+        user.setAddress(request.getAddress());
+        user.setBirthDate(request.getBirthDate());
+
         userRepository.save(user);
+
     }
 
     @PutMapping("{id}")
-    public void update(@PathVariable int id, @RequestBody User user){
-        User updatedUser = userRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no user with id: " + id));
-        updatedUser.setId(user.getId());
-        updatedUser.setFirstname(user.getFirstname());
-        updatedUser.setLastname(user.getLastname());
-        updatedUser.setEmail(user.getEmail());
-        updatedUser.setPhoneNumber(user.getPhoneNumber());
-        updatedUser.setNationalityNumber(user.getNationalityNumber());
-        updatedUser.setAddress(user.getAddress());
-        updatedUser.setBirthDate(user.getBirthDate());
+    public void update(@PathVariable int id, @RequestBody UpdateUserRequest request){
 
-        userRepository.save(updatedUser);
+        User user = userRepository.findById(id).orElseThrow();
+        user.setFirstname(request.getFirstName());
+        user.setLastname(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setNationalityNumber(request.getNationalityNumber());
+        user.setAddress(request.getAddress());
+        user.setBirthDate(request.getBirthDate());
+
+        userRepository.save(user);
+
+
+
     }
 
     @DeleteMapping("{id}")

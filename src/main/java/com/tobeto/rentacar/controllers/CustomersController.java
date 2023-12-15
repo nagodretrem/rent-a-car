@@ -1,6 +1,11 @@
 package com.tobeto.rentacar.controllers;
 
+import com.tobeto.rentacar.dtos.requests.customer.AddCustomerRequest;
+import com.tobeto.rentacar.dtos.requests.customer.UpdateCustomerRequest;
+import com.tobeto.rentacar.dtos.responses.customer.GetCustomerListResponse;
+import com.tobeto.rentacar.dtos.responses.customer.GetCustomerResponse;
 import com.tobeto.rentacar.entities.Customer;
+import com.tobeto.rentacar.entities.User;
 import com.tobeto.rentacar.repositories.CustomerRepository;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,27 +21,53 @@ public class CustomersController {
     }
 
     @GetMapping
-    public List<Customer> getAll(){
-        return customerRepository.findAll();
+    public List<GetCustomerListResponse> getAll(){
+
+        List<Customer> customers = customerRepository.findAll();
+
+        return customers.stream().map(customer -> {
+            GetCustomerListResponse response = new GetCustomerListResponse();
+            response.setId(customer.getId());
+            response.setName(customer.getUser().getFirstname() + " " + customer.getUser().getLastname());
+            return response;
+        }).toList();
     }
 
     @GetMapping("{id}")
-    public Customer getById(@PathVariable int id) {
-        return customerRepository.findById(id).orElseThrow();
+    public GetCustomerResponse getById(@PathVariable int id) {
+
+        Customer customer = customerRepository.findById(id).orElseThrow();
+        GetCustomerResponse response = new GetCustomerResponse();
+
+        response.setName(customer.getUser().getFirstname() + " " + customer.getUser().getLastname());
+
+        return response;
     }
 
     @PostMapping
-    public void save(@RequestBody Customer customer){
+    public void add(@RequestBody AddCustomerRequest request){
+
+        Customer customer = new Customer();
+
+        User user = new User();
+        user.setId(request.getUserId());
+        customer.setUser(user);
+
+
         customerRepository.save(customer);
     }
 
     @PutMapping("{id}")
-    public void update(@PathVariable int id, @RequestBody Customer customer){
-        Customer updatedCustomer = customerRepository.findById(id).orElseThrow(()-> new RuntimeException("There is no customer with id: " + id));
-        updatedCustomer.setId(customer.getId());
-        updatedCustomer.setStatus(customer.isStatus());
+    public void update(@PathVariable int id, @RequestBody UpdateCustomerRequest request){
 
-        customerRepository.save(updatedCustomer);
+        Customer customer = customerRepository.findById(id).orElseThrow();
+
+        User user = new User();
+        user.setId(request.getUserId());
+        customer.setUser(user);
+        customer.setActive(request.isActive());
+
+        customerRepository.save(customer);
     }
 
     @DeleteMapping("{id}")
