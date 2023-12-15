@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "rentals")
@@ -19,13 +20,13 @@ public class Rental {
     private int id;
 
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "return_date")
-    private Date returnDate;
+    private LocalDate returnDate;
 
     @Column(name = "start_kilometer")
     private int startKilometer;

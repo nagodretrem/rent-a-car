@@ -29,7 +29,7 @@ public class Car {
     private double dailyPrice;
 
     @Column(name = "status")
-    private boolean status;
+    private boolean isActive;
 
     @ManyToOne
     @JoinColumn(name = "model_id")

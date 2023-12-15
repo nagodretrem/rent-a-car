@@ -26,7 +26,7 @@ public class Insurance {
     private double dailyPrice;
 
     @Column(name = "status")
-    private boolean status;
+    private boolean isActive;
 
     @ManyToOne
     @JoinColumn(name = "company_id")
